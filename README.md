@@ -7,7 +7,7 @@ This repository contains examples of different test automation architectures, in
 To clone and set up the repository, run the following command:
 
 ```sh
-git clone https://github.com/your-username/Test-automation-architecture.git
+git clone https://github.com/senakorkmaz/Test-automation-architecture.git
 cd Test-automation-architecture
 npm install
 ```
