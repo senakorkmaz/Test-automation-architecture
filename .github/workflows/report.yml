@@ -32,11 +32,9 @@ jobs:
           zip -r playwright-report.zip blob-report
 
       - name: Upload to Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: "C08SE713SPQ"
-          initial-comment: "📦 The test report is attached."
-          filename: "playwright-report.zip"
-          file: ./playwright-report.zip
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          curl -F file=@playwright-report.zip \
+               -F "initial_comment=📦 The test report is attached." \
+               -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
+               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+               https://slack.com/api/files.upload
