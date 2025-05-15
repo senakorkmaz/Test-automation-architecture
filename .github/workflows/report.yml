@@ -36,7 +36,7 @@ jobs:
         with:
           payload: |
             {
-              "channel": "#automation-alert",
+              "channel": "C08SE713SPQ",
               "initial_comment": "📦 The test report is attached.",
               "filename": "playwright-report.zip"
             }
