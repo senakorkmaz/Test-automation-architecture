@@ -1,0 +1,41 @@
+name: Run Playwright Tests and Send Report
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests and generate blob report
+        run: npx playwright test --reporter=blob
+
+      - name: Zip report folder
+        run: |
+          zip -r playwright-report.zip blob-report
+
+      - name: Upload to Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "channel": "#automation-alert",
+              "initial_comment": "📦 The test report is attached.",
+              "filename": "playwright-report.zip"
+            }
+          file: "./playwright-report.zip"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
