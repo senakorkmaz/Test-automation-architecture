@@ -35,7 +35,6 @@ jobs:
       - name: Upload to Slack
         run: |
           curl -F file=@playwright-report.zip \
-               -F "initial_comment=📦 The test report is attached." \
                -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
                -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
                https://slack.com/api/files.upload
