@@ -21,7 +21,7 @@ jobs:
         run: npm i
 
       - name: Install Playwright browsers
-        run: npx playwright install
+        run: npx playwright install --with-deps
 
       - name: Run tests and generate blob report
         run: npx playwright test --reporter=blob
