@@ -18,7 +18,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm i
 
       - name: Run tests and generate blob report
         run: npx playwright test --reporter=blob
