@@ -34,12 +34,9 @@ jobs:
       - name: Upload to Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload: |
-            {
-              "channel": "C08SE713SPQ",
-              "initial_comment": "📦 The test report is attached.",
-              "filename": "playwright-report.zip"
-            }
-          file: "./playwright-report.zip"
+          channel-id: "C08SE713SPQ"
+          initial-comment: "📦 The test report is attached."
+          filename: "playwright-report.zip"
+          file: ./playwright-report.zip
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
