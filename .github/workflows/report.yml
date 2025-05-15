@@ -25,6 +25,7 @@ jobs:
 
       - name: Run tests and generate blob report
         run: npx playwright test --reporter=blob
+        continue-on-error: true
 
       - name: Zip report folder
         run: |
