@@ -31,7 +31,7 @@ jobs:
       - name: Extract failed test cases
         id: extract_failures
         run: |
-          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print "`"$0"`"}')
+          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print "` " $0 " `"}')
           
           PASSED=$(grep -oP '\d+(?= passed)' test-results.log || echo 0)
           FAILED=$(grep -oP '\d+(?= failed)' test-results.log || echo 0)
