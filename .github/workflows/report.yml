@@ -41,7 +41,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          MESSAGE="🚨 *Playwright Test Failures Detected!* \n ${{ steps.extract_failures.outputs.failed_tests }}"
+          MESSAGE='🚨 *Playwright Test Failures Detected!* \n ${{ steps.extract_failures.outputs.failed_tests }}'
           curl -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
