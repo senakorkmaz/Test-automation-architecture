@@ -32,16 +32,30 @@ jobs:
         id: extract_failures
         run: |
           FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print " "$0}')
+          
+          PASSED=$(grep -oP '\d+(?= passed)' test-results.log || echo 0)
+          FAILED=$(grep -oP '\d+(?= failed)' test-results.log || echo 0)
+          TOTAL=$((PASSED + FAILED))
+          SUMMARY="✅ $PASSED passed, ❌ $FAILED failed, 📊 $TOTAL total"
+      
           echo "failed_tests<<EOF" >> $GITHUB_OUTPUT
           echo "$FAILED_TESTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+      
+          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
           
-      - name: Send failed test summary to Slack
+      - name: Send test summary to Slack
+        if: always()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          MESSAGE=$'🚨 *Playwright Test Failures Detected!* \n ${{ steps.extract_failures.outputs.failed_tests }}'
+          if [ -n "${{ steps.extract_failures.outputs.failed_tests }}" ]; then
+            MESSAGE=$'🧪 *Playwright Test Results* \n ${{ steps.extract_failures.outputs.failed_tests }}\n\n${{ steps.extract_failures.outputs.summary }}'
+          else
+            MESSAGE=$'🧪 *Playwright Test Results* \n ✅ All tests passed!\n\n${{ steps.extract_failures.outputs.summary }}'
+          fi
+      
           curl -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
