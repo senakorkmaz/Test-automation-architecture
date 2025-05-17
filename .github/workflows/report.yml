@@ -28,24 +28,23 @@ jobs:
         run: npx playwright test | tee test-results.log
         continue-on-error: true
 
-      - name: Extract failed test cases and build message
-        id: extract_failures
+      - name: Extract test result and build message
+        id: extract_result
         run: |
-          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print $0 "\n"}')
-          
           PASSED=$(grep -oP '\d+(?= passed)' test-results.log || echo 0)
           FAILED=$(grep -oP '\d+(?= failed)' test-results.log || echo 0)
           TOTAL=$((PASSED + FAILED))
-          SUMMARY="📊 $TOTAL Total ✅ $PASSED Passed ❌ $FAILED Failed "
-
+      
+          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print "`"$0"`"}')
+      
+          SUMMARY="📊 *$TOTAL Total* | ✅ *$PASSED Passed* | ❌ *$FAILED Failed*"
+      
           if [ -n "$FAILED_TESTS" ]; then
-            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n*Failed Tests:*\n'"$FAILED_TESTS"$'\n'"$SUMMARY"
+            MESSAGE=$'🧪 *Playwright Test Results*\n\n*❌ Failed Tests:*\n'"$FAILED_TESTS"$'\n\n'"$SUMMARY"
           else
-            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n\n✅ All tests passed!\n\n'"$SUMMARY"
+            MESSAGE=$'🧪 *Playwright Test Results*\n\n✅ *All tests passed!*\n\n'"$SUMMARY"
           fi
-
-          # Output all for next steps
-          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
+      
           echo "message<<EOF" >> $GITHUB_OUTPUT
           echo "$MESSAGE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -61,5 +60,5 @@ jobs:
             -H "Content-Type: application/json" \
             --data "$(jq -n \
               --arg channel "$SLACK_CHANNEL_ID" \
-              --arg text "${{ steps.extract_failures.outputs.message }}" \
+              --arg text "${{ steps.extract_result.outputs.message }}" \
               '{channel: $channel, text: $text}')"
