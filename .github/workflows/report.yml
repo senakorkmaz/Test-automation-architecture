@@ -31,7 +31,7 @@ jobs:
       - name: Extract failed test cases
         id: extract_failures
         run: |
-          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print "- "$0}' ORS='\\n')
+          FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print "- "$0}' ORS='\n ')
           echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Send failed test summary to Slack
@@ -39,7 +39,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          MESSAGE="🚨 *Playwright Test Failures Detected!* \\n ${{ steps.extract_failures.outputs.failed_tests }}"
+          MESSAGE="🚨 *Playwright Test Failures Detected!* \n ${{ steps.extract_failures.outputs.failed_tests }}"
           curl -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
