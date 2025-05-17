@@ -35,7 +35,6 @@ jobs:
           echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Send failed test summary to Slack
-        if: failure()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
