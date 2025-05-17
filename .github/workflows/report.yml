@@ -28,7 +28,7 @@ jobs:
         run: npx playwright test | tee test-results.log
         continue-on-error: true
 
-      - name: Extract failed test cases
+      - name: Extract failed test cases and build message
         id: extract_failures
         run: |
           FAILED_TESTS=$(grep -E "^[[:space:]]*[0-9]+\)" test-results.log | awk '{$1=$1; print $0 "\n"}')
@@ -37,26 +37,29 @@ jobs:
           FAILED=$(grep -oP '\d+(?= failed)' test-results.log || echo 0)
           TOTAL=$((PASSED + FAILED))
           SUMMARY="✅ $PASSED passed, ❌ $FAILED failed, 📊 $TOTAL total"
-      
-          echo "failed_tests<<EOF" >> $GITHUB_OUTPUT
-          echo "$FAILED_TESTS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      
+
+          if [ -n "$FAILED_TESTS" ]; then
+            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n\n*❌ Failed Tests:*\n'"$FAILED_TESTS"$'\n'"$SUMMARY"
+          else
+            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n\n✅ All tests passed!\n\n'"$SUMMARY"
+          fi
+
+          # Output all for next steps
           echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
-          
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Send test summary to Slack
         if: always()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          if [ -n "${{ steps.extract_failures.outputs.failed_tests }}" ]; then
-            MESSAGE=$'🧪 *Playwright Test Results* 🧪 \n \n  *Failed Tests:* \n ${{ steps.extract_failures.outputs.failed_tests }} \n \n ${{ steps.extract_failures.outputs.summary }}'
-          else
-            MESSAGE=$'🧪 *Playwright Test Results*  🧪 \n ✅ All tests passed! \n \n${{ steps.extract_failures.outputs.summary }}'
-          fi
-      
           curl -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
-            --data "$(jq -n --arg channel "$SLACK_CHANNEL_ID" --arg text "$MESSAGE" '{channel: $channel, text: $text}')"
+            --data "$(jq -n \
+              --arg channel "$SLACK_CHANNEL_ID" \
+              --arg text "${{ steps.extract_failures.outputs.message }}" \
+              '{channel: $channel, text: $text}')"
