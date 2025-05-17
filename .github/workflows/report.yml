@@ -51,7 +51,7 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
           if [ -n "${{ steps.extract_failures.outputs.failed_tests }}" ]; then
-            MESSAGE=$'🧪 *Playwright Test Results* *\n\n ❌ Failed Tests: \n ${{ steps.extract_failures.outputs.failed_tests }} \n \n ${{ steps.extract_failures.outputs.summary }}'
+            MESSAGE=$'🧪 *Playwright Test Results* * \n \n  Failed Tests: \n ${{ steps.extract_failures.outputs.failed_tests }} \n \n ${{ steps.extract_failures.outputs.summary }}'
           else
             MESSAGE=$'🧪 *Playwright Test Results* \n ✅ All tests passed!\n\n${{ steps.extract_failures.outputs.summary }}'
           fi
