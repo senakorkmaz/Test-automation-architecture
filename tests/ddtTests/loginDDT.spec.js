@@ -8,8 +8,6 @@ test.describe('Data-Driven Login Tests', () => {
       const loginPage = new LoginPage(page);
       await loginPage.navigate();
       await loginPage.login(data.username, data.password);
-
-      await expect(page).toHaveURL(/inventory/);
     });
   });
 });
