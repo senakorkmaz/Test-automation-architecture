@@ -25,16 +25,26 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run tests and generate blob report
-        run: npx playwright test --reporter=blob
+        run: npx playwright test > test-results.log
         continue-on-error: true
 
-      - name: Zip report folder
+      - name: Extract failed test cases
+        id: extract_failures
         run: |
-          zip -r playwright-report.zip blob-report
+          FAILED_TESTS=$(grep -i "FAIL" test-results.log | sed 's/.*FAIL\s\+\(.*\)/- \1/' | tr '\n' '\\n')
+          echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
 
-      - name: Upload to Slack
+      - name: Send failed test summary to Slack
+        if: failure()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          curl -F file=@playwright-report.zip \
-               -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
-               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-               https://slack.com/api/files.upload
+          MESSAGE="🚨 *Test Failures Detected!*\n\n${{ steps.extract_failures.outputs.failed_tests }}"
+          curl -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-type: application/json" \
+            --data "{
+              \"channel\": \"$SLACK_CHANNEL_ID\",
+              \"text\": \"$MESSAGE\"
+            }"
