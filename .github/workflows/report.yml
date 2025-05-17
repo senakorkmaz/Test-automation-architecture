@@ -39,7 +39,7 @@ jobs:
           SUMMARY="📊 $TOTAL Total ✅ $PASSED Passed ❌ $FAILED Failed "
 
           if [ -n "$FAILED_TESTS" ]; then
-            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n\n*Failed Tests:*\n'"$FAILED_TESTS"$'\n'"$SUMMARY"
+            MESSAGE=$'🧪 *Playwright Test Results* 🧪\n \n *Failed Tests:*\n'"$FAILED_TESTS"$' \n \n '"$SUMMARY"
           else
             MESSAGE=$'🧪 *Playwright Test Results* 🧪\n\n✅ All tests passed!\n\n'"$SUMMARY"
           fi
