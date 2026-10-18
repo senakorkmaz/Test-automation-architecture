@@ -52,6 +52,26 @@ npx playwright test
 npx cucumber-js tests/bddTests/features/*.feature --require tests/bddTests/world.js --require tests/bddTests/steps/*.js
 ```
 
+## AI Skills (Codex)
+
+The `.agents/skills/` folder contains three sample [Codex skills](https://learn.chatgpt.com/docs/build-skills) that work together to add new tests to this project:
+
+| Skill | What it does | Output |
+|---|---|---|
+| `id-testdata-finder` | Opens the page in a browser, finds a stable locator and test data for each component, and lists components without IDs | `skill-output/<page-name>/ids-and-testdata.md` |
+| `scenario-explorer` | Explores the page in a browser and lists the test scenarios it observes | `skill-output/<page-name>/scenarios.md` |
+| `pom-implementer` | Reads both outputs and implements the scenarios in this project's Page Object Model structure | Page objects in `pages/`, tests in `tests/pomTests/` and `tests/ddtTests/` |
+
+Open the repository in Codex and run them in order:
+
+```text
+$id-testdata-finder https://www.saucedemo.com/inventory.html
+$scenario-explorer https://www.saucedemo.com/inventory.html
+$pom-implementer inventory
+```
+
+Always review the generated tests before merging them.
+
 ## Contributing
 Feel free to submit pull requests or open issues for improvements.
 
